@@ -8,6 +8,7 @@ module.exports.errorLogger = function errorLogger(logwriter, winston) {
 
             var exceptionMeta = winston.exception.getAllInfo(err);
             exceptionMeta.req = {
+                date: (new Date()).toISOString(),
                 body: bodyToString(req.body),
                 method: req.method,
                 url: req.originalUrl || req.url,
@@ -18,11 +19,13 @@ module.exports.errorLogger = function errorLogger(logwriter, winston) {
                 hostname: req.hostname,
                 ip: req.ip
             };
-            exceptionMeta.date = (new Date()).toUTCString();
+            exceptionMeta.date = (new Date()).toISOString();
 
+            console.log((new Date()).toISOString())
             logwriter.log(level, exceptionMeta);
 
         } catch (erm) {
+            console.log((new Date()).toISOString())
             console.log(JSON.stringify({
                 "LoggerError": {
                     "error": erm,
@@ -41,7 +44,6 @@ module.exports.logger = function logger(logwriter) {
 
     return function (req, res, next) {  
         try {
-            console.log("srujan1")
             var end = res.end;
             req._startTime = (new Date());
             res.end = function (responseBody, encoding) {
@@ -61,7 +63,7 @@ module.exports.logger = function logger(logwriter) {
                 var isResponseJson = (res._headers && res._headers['content-type'] && res._headers['content-type'].indexOf('json') >= 0);
 
                 var logData = {
-                    date: (new Date()).toUTCString(),
+                    date: (new Date()).toISOString(),
 
                     res: {
                         body: bodyToString(responseBody),
@@ -84,10 +86,11 @@ module.exports.logger = function logger(logwriter) {
                     }
                 };
 
+                console.log((new Date()).toISOString())
                 logwriter.log(statusLevels, logData);
             };
         } catch (err) {
-            console.log("srujan3")
+            console.log((new Date()).toISOString())
             console.log(JSON.stringify({
                 "LoggerError": {
                     "error": err,

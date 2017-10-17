@@ -10,7 +10,7 @@ RUN npm config set registry http://registry.npmjs.org/
 RUN npm install
 
 # Expose the app port
-EXPOSE 8082
+EXPOSE 8000
 
 # Start the app
 CMD node app.js
