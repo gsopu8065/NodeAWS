@@ -1,32 +1,37 @@
 var express = require('express');
 var winston = require('winston');
+var winstonRotator = require('winston-daily-rotate-file');
 var expressWinston = require('express-winston');
 var loggerFile = require('./logConfig/logger')
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
+var fs = require('file-system');
 
 var app = module.exports = express();
 app.use(bodyParser.json());
 app.use(methodOverride());
 
+if(!fs.existsSync('/tmp/logs')){
+    fs.mkdirSync('/tmp/logs');
+}
+
 // Let's make our express `Router` first.
 var router = express.Router();
-router.get('/error', function(req, res, next) {
+router.get('/hello/error', function(req, res, next) {
     // here we cause an error in the pipeline so we see express-winston in action.
     return next(new Error("This is an error and it should be logged to the console"));
 });
 
-//asurion
-var logwriter = new winston.Logger({
-    transports: [
-        new winston.transports.Console({
-            json: true,
-            colorize: false,
-            handleExceptions: true
-
-        })
-    ],
-    exitOnError: false
+const logwriter = new winston.Logger({
+    'transports': []
+});
+logwriter.add(winstonRotator, {
+    'name': 'access-file',
+    'level': 'info',
+    'filename': '/tmp/logs/apilogs.log',
+    'json': true,
+    'datePattern': 'yyyy-MM-dd-',
+    'prepend': true
 });
 
 expressWinston.requestWhitelist.push('body');
@@ -41,7 +46,7 @@ app.use(router);
 app.use(loggerFile.errorLogger(logwriter, winston));
 
 var server = app.listen(8081, function(){
-    console.log("express-winston demo listening on port %d in %s mode", this.address().port, app.settings.env);
+    logwriter.info("server started")
 });
 
 module.exports = app;

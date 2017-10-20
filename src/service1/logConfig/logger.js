@@ -21,12 +21,10 @@ module.exports.errorLogger = function errorLogger(logwriter, winston) {
             };
             exceptionMeta.date = (new Date()).toISOString();
 
-            console.log((new Date()).toISOString())
             logwriter.log(level, exceptionMeta);
 
         } catch (erm) {
-            console.log((new Date()).toISOString())
-            console.log(JSON.stringify({
+            logwriter.error(JSON.stringify({
                 "LoggerError": {
                     "error": erm,
                     "level": "error",
@@ -86,12 +84,10 @@ module.exports.logger = function logger(logwriter) {
                     }
                 };
 
-                console.log((new Date()).toISOString())
-                logwriter.log(statusLevels, logData);
+                logwriter.info(logData);
             };
         } catch (err) {
-            console.log((new Date()).toISOString())
-            console.log(JSON.stringify({
+            logwriter.error(JSON.stringify({
                 "LoggerError": {
                     "error": err,
                     "level": "error",
