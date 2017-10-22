@@ -23,7 +23,7 @@ router.get('/hello/error', function(req, res, next) {
 });
 
 const logwriter = new winston.Logger({
-    'transports': []
+    'transports': [new (winston.transports.Console)()]
 });
 logwriter.add(winstonRotator, {
     'name': 'access-file',

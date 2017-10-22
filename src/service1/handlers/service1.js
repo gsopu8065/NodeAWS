@@ -1,10 +1,43 @@
 var app = require('./../app');
-app.get('/hello', function (req, res) {
+var aws = require('aws-sdk'),
+    multer = require('multer'),
+    multerS3 = require('multer-s3');
 
+aws.config.update({
+    secretAccessKey: 'tQYPS7XvLNxp116J+MNsV2uwpwmDs0l9+B21db7Y',
+    accessKeyId: 'AKIAI6SG72BA6JF2URUA',
+    region: 'us-east-2'
+});
+
+var s3 = new aws.S3();
+
+var upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: 'sample8065',
+        metadata: function (req, file, cb) {
+            cb(null, {fieldName: file.fieldname});
+        },
+        key: function (req, file, cb) {
+            cb(null, file.originalname+Date.now().toString())
+        }
+    })
+});
+
+
+
+
+app.get('/hello', function (req, res) {
     res.send({ name:'Hello World Service'});
 
 });
 
-app.get('/go', function(req, res) {
-    res.send('This is a normal request, it should be logged to the console too');
+app.post('/go', function(req, res) {
+    console.log("welcome")
+    res.send({ name:'Hello World Service'});
+});
+
+//used by upload form
+app.post('/upload', upload.array('upl',1), function (req, res, next) {
+    res.send("Uploaded!"+JSON.stringify(req.files));
 });
